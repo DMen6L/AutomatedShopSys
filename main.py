@@ -15,24 +15,24 @@ def test_connection(db: Database):
     else:
         fail("Could not connect to database")
 
-def test_add_general_product(db: Database) -> int | None:
-    print("\n[2] add_general_product")
+def test_add_or_extract_general_product(db: Database) -> int | None:
+    print("\n[2] add_or_extract_general_product")
     gp = GeneralProduct(id=0, name="Test Laptop", description="A generic test laptop")
-    gp_id = db.add_general_product(gp)
+    gp_id = db.add_or_extract_general_product(gp)
     if gp_id:
         ok("Inserted / found general_product id", gp_id)
     else:
-        fail("add_general_product returned None")
+        fail("add_or_extract_general_product returned None")
     return gp_id
 
-def test_add_attribute(db: Database) -> int | None:
-    print("\n[3] add_attribute")
+def test_add_or_extract_attribute(db: Database) -> int | None:
+    print("\n[3] add_or_extract_attribute")
     attr = Attributes(id=0, name="RAM", unit="GB", data_type="number")
-    attr_id = db.add_attribute(attr)
+    attr_id = db.add_or_extract_attribute(attr)
     if attr_id:
         ok("Inserted / found attribute id", attr_id)
     else:
-        fail("add_attribute returned None")
+        fail("add_or_extract_attribute returned None")
     return attr_id
 
 def test_add_product(db: Database):
@@ -68,8 +68,8 @@ def main():
     db = Database()
 
     test_connection(db)
-    test_add_general_product(db)
-    test_add_attribute(db)
+    test_add_or_extract_general_product(db)
+    test_add_or_extract_attribute(db)
     test_add_product(db)
 
     print("\n" + "=" * 50)

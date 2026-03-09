@@ -26,8 +26,9 @@ class Database:
             print(f"Database connection error: {e}")
             return False
     
-    def add_general_product(self, general_product_data: GeneralProduct) -> int | None:
+    def add_or_extract_general_product(self, general_product_data: GeneralProduct) -> int | None:
         try:
+            # Trying insertion
             self.cursor.execute(
                 """
                     INSERT INTO general_products(name, description)
@@ -39,6 +40,7 @@ class Database:
             )
             result = self.cursor.fetchone()
 
+            # Checking if insertion already exists
             if not result:
                 self.cursor.execute(
                     "SELECT id FROM general_products WHERE name = %s",
@@ -53,11 +55,12 @@ class Database:
             print(f"Database error: {e}")
             return None
     
-    def add_attribute(
+    def add_or_extract_attribute(
         self,
         attribute: Attributes
     ) -> int | None:
         try:
+            # Trying insertion
             self.cursor.execute(
                 """
                     INSERT INTO attributes(name, unit, data_type)
@@ -69,6 +72,7 @@ class Database:
             )
             result = self.cursor.fetchone()
 
+            # Checking existance of the instance
             if not result:
                 if attribute.unit is None:
                     self.cursor.execute(
@@ -99,12 +103,14 @@ class Database:
         category_id: int
     ) -> bool:
         try:
-            general_product_id = self.add_general_product(general_product)
+            # Adding general product
+            general_product_id = self.add_or_extract_general_product(general_product)
             if general_product_id is None:
                 return False
 
+            # Adding attributes
             for attribute, value in zip(attributes, values):
-                attribute_id = self.add_attribute(attribute)
+                attribute_id = self.add_or_extract_attribute(attribute)
 
                 if attribute_id is None:
                     return False
@@ -128,15 +134,17 @@ class Database:
                     if not self.cursor.fetchone():
                         return False
 
-            # Tie data to the product
+            # Tie corresponding data to the product
             product.general_product_id = general_product_id
             product.company_id = company_id
             product.category_id = category_id
 
+            # Adding product
             self.cursor.execute(
                 """
                     INSERT INTO products(buy_price, margin_percentage, general_product_id, company_id, category_id)
                     VALUES (%s, %s, %s, %s, %s)
+                    ON CONFLICT (general_product_id, company_id, category_id) DO NOTHING
                     RETURNING id
                 """,
                 (product.buy_price, product.margin_percentage, general_product_id, company_id, category_id)
@@ -150,7 +158,7 @@ class Database:
                 if not self.cursor.fetchone():
                     return False
             
-            self.connection.commit()
+            self.connection.commit() # commit
             return True
         except Exception as e:
             self.connection.rollback()

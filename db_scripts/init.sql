@@ -58,7 +58,9 @@ CREATE TABLE IF NOT EXISTS products(
 
     FOREIGN KEY(general_product_id) REFERENCES general_products(id) ON DELETE SET NULL,
     FOREIGN KEY(company_id) REFERENCES companies(id) ON DELETE SET NULL,
-    FOREIGN KEY(category_id) REFERENCES categories(id) ON DELETE SET NULL
+    FOREIGN KEY(category_id) REFERENCES categories(id) ON DELETE SET NULL,
+
+    UNIQUE(general_product_id, company_id, category_id)
 );
 
 CREATE TABLE IF NOT EXISTS kaspi_products(
