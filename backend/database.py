@@ -1,10 +1,13 @@
 import psycopg2
-import dotenv
 import os
+from pathlib import Path
+from dotenv import load_dotenv
 
 from table_templates import Product, GeneralProduct, Attributes, GeneralProductAttributes
 
-dotenv.load_dotenv()
+# Load .env from the project root (one level above this file's directory)
+_env_path = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(dotenv_path=_env_path)
 
 class Database:
     def __init__(self):

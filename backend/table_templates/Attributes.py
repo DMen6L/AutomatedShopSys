@@ -3,7 +3,7 @@ from dataclasses import dataclass
 @dataclass
 class Attributes:
     name: str
-    unit: str
+    unit: str | None
     data_type: str
     id: int = 0
 
